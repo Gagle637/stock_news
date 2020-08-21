@@ -1,17 +1,22 @@
 <template>
   <div id="app">
     <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <button @click="stock()">d3</button>
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+// import dataset from "./samsung.csv";
+var d3 = require("d3");
 
 export default {
   name: 'App',
-  components: {
-    HelloWorld
+  methods: {
+    async stock() {
+      let data = await d3.csv("/dataset/samsung.csv");
+      console.log(data)
+    }
   }
 }
 </script>
