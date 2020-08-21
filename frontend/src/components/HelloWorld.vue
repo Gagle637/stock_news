@@ -56,11 +56,11 @@
         })
 
         document.getElementById("chart").onclick = function(evt){
-            var activePoints = chart.getElementsAtEvent(evt);
-            var firstPoint = activePoints[0];
-            var label = chart.data.labels[firstPoint._index];
-            var value = chart.data.datasets[firstPoint._datasetIndex].data[firstPoint._index];
-            alert(label + ": " + value);
+          var activePoints = chart.getElementsAtEvent(evt);
+          var firstPoint = activePoints[0];
+          var label = chart.data.labels[firstPoint._index];
+          var value = chart.data.datasets[firstPoint._datasetIndex].data[firstPoint._index];
+          alert(label + ": " + value);
         };
       }
     }
