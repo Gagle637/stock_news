@@ -67,4 +67,4 @@ class news(APIView):
                 except Exception as e:
                     continue
             page += 10
-        return Response(json.dumps(data, ensure_ascii=False), status=status.HTTP_200_OK)
+        return Response(json.loads(json.dumps(data, ensure_ascii=False)), status=status.HTTP_200_OK)
