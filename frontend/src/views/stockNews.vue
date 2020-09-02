@@ -28,7 +28,11 @@
   export default {
     data: () => {
       return {
-        title: "",
+        dataset: {
+          '삼성전자': 'samsung',
+          '애플': 'apple'
+        },
+        title: '',
         news: []
       }
     },
@@ -50,7 +54,9 @@
         document.getElementById('myModal').style.display = ''
       },
       async stock() {
-        let data = await d3.csv('/dataset/samsung.csv')
+        console.log(this.dataset[this.$route.params.company])
+        let data = await d3.csv(`/dataset/${this.dataset[this.$route.params.company]}.csv`)
+        console.log(data)
         let labels = data.map(function(d) {return d.Date})
         let stockData = data.map(function(d) {return d.Close})
         
@@ -95,7 +101,7 @@
           var label = chart.data.labels[firstPoint._index]
           var value = chart.data.datasets[firstPoint._datasetIndex].data[firstPoint._index]
           if (confirm(label + ': ' + value)) {
-            this.getNews(label.replace(/-/gi, "."))
+            this.getNews(label.replace(/-/gi, '.'))
           }
         }
       }

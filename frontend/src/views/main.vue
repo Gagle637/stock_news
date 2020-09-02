@@ -12,7 +12,8 @@
     data: () => {
       return {
         logos: {
-          "삼성전자": require("@/assets/삼성전자.png")
+          "삼성전자": require("@/assets/삼성전자.png"),
+          "애플": require("@/assets/애플.png")
         }
       }
     },
