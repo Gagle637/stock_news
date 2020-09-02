@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HelloWorld from '@/components/HelloWorld.vue'
+import stockNews from '@/views/stockNews.vue'
+import main from '@/views/main.vue'
 
 const history = createWebHistory()
 const router = createRouter({
@@ -7,8 +8,13 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'HelloWorld',
-      component: HelloWorld,
+      name: 'main',
+      component: main,
+    },
+    {
+      path: '/stock-news/:company/',
+      name: 'stockNews',
+      component: stockNews,
     },
   ]
 })

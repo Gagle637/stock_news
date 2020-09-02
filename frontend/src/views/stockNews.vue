@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Hello World ! ! !</h1>
+    <h1>{{ title }}</h1>
     <div id="myModal" class="modal">
       <div class="modal-content">
         <p class="loading">
@@ -8,13 +8,12 @@
         </p>
       </div>
     </div>
-    <button @click="getNews">click</button>
     <canvas id="chart" @on-receive="click"></canvas>
     <div v-for="(dayNews, idx) in news" :key="idx">
       <p>{{ dayNews.title }}</p>
       <p>{{ dayNews.date }}</p>
       <p>{{ dayNews.link }}</p>
-      <p>{{ dayNews.description }}</p>
+      <!-- <p>{{ dayNews.description }}</p> -->
       <!-- <p>{{ dayNews.company }}</p> -->
     </div>
   </div>
@@ -23,22 +22,24 @@
 <script>
   import Chart from 'chart.js'
   import axios from 'axios'
-  var d3 = require("d3")
+  var d3 = require('d3')
   
 
   export default {
     data: () => {
       return {
+        title: "",
         news: []
       }
     },
     mounted() {
+      this.title = this.$route.params.company
       this.stock()
     },
     methods: {
-      async getNews() {
-        document.getElementById("myModal").style.display = "block"
-        await axios.get("articles/news/")
+      async getNews(date) {
+        document.getElementById('myModal').style.display = 'block'
+        await axios.get(`articles/news/${this.title}/${date}/`)
           .then(res => {
             this.news = res.data.data
             console.log(res.data.data)
@@ -46,10 +47,10 @@
           .catch(err => {
             console.log(err)
           })
-        document.getElementById("myModal").style.display = ""
+        document.getElementById('myModal').style.display = ''
       },
       async stock() {
-        let data = await d3.csv("/dataset/samsung.csv")
+        let data = await d3.csv('/dataset/samsung.csv')
         let labels = data.map(function(d) {return d.Date})
         let stockData = data.map(function(d) {return d.Close})
         
@@ -62,13 +63,13 @@
             },
             elements: {
               point:{
-                radius: 2
+                radius: 0
               }
             },
             scales: {
               xAxes: [{
                 gridLines: {
-                  display:false
+                  display: false
                 },
                 ticks: {
                   display: false
@@ -88,12 +89,14 @@
           },
         })
 
-        document.getElementById("chart").onclick = function(evt){
+        document.getElementById('chart').onclick = evt => {
           var activePoints = chart.getElementsAtEvent(evt)
           var firstPoint = activePoints[0]
           var label = chart.data.labels[firstPoint._index]
           var value = chart.data.datasets[firstPoint._datasetIndex].data[firstPoint._index]
-          alert(label + ": " + value)
+          if (confirm(label + ': ' + value)) {
+            this.getNews(label.replace(/-/gi, "."))
+          }
         }
       }
     }
