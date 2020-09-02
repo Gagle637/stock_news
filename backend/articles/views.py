@@ -36,16 +36,16 @@ def get_news(n_url):
     return news_detail
 
 class news(APIView):
-    def get(self, request, format=None):
-        query = "삼성전자"   # url 인코딩 에러는 encoding parse.quote(query)
-        s_date = "2018.08.20"
-        e_date = "2010.08.20"
+    def get(self, request, company, date, format=None):
+        query = company
+        s_date = date
+        e_date = date
         s_from = s_date.replace(".","")
         e_to = e_date.replace(".","")
         page = 1
         data = {"data":[]}
-        while page < 40:
-            url = "https://search.naver.com/search.naver?where=news&query=" + query + "&sort=1&ds=" + s_date + "&de=" + e_date + "&nso=so%3Ar%2Cp%3Afrom" + s_from + "to" + e_to + "%2Ca%3A&start=" + str(page)
+        while page < 20:
+            url = "https://search.naver.com/search.naver?where=news&query=" + query + "&sort=0&ds=" + s_date + "&de=" + e_date + "&nso=so%3Ar%2Cp%3Afrom" + s_from + "to" + e_to + "%2Ca%3A&start=" + str(page)
             header = {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
             }
