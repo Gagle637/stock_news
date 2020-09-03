@@ -8,6 +8,9 @@
         </p>
       </div>
     </div>
+    <input type="date" class="chartStart">
+    <input type="date" class="chartEnd">
+    <button class="update-chart">초기화</button>
     <canvas id="chart" @on-receive="click"></canvas>
     <div v-for="(dayNews, idx) in news" :key="idx">
       <p>{{ dayNews.title }}</p>
@@ -46,7 +49,6 @@
         await axios.get(`articles/news/${this.title}/${date}/`)
           .then(res => {
             this.news = res.data.data
-            console.log(res.data.data)
           })
           .catch(err => {
             console.log(err)
@@ -54,30 +56,33 @@
         document.getElementById('myModal').style.display = ''
       },
       async stock() {
-        console.log(this.dataset[this.$route.params.company])
         let data = await d3.csv(`/dataset/${this.dataset[this.$route.params.company]}.csv`)
-        console.log(data)
         let labels = data.map(function(d) {return d.Date})
         let stockData = data.map(function(d) {return d.Close})
-        
         var ctx = document.getElementById('chart')
         var chart = new Chart(ctx, {
           type: 'line',
           options: {
+            tooltips: {
+              mode: 'index',
+              intersect: false
+            },
             legend: {
               display: false
             },
             elements: {
               point:{
-                radius: 0
+                radius: 0,
+                hoverRadius: 0
               }
             },
             scales: {
               xAxes: [{
-                gridLines: {
-                  display: false
+                type: 'time',
+                time: {
+                  unit: 'year'
                 },
-                ticks: {
+                gridLines: {
                   display: false
                 }
               }]
@@ -94,9 +99,27 @@
             ],
           },
         })
+        
+        document.querySelector(".chartStart").addEventListener('change', evt => {
+          chart.options.scales.xAxes[0].ticks.min = document.querySelector(".chartStart").value
+          chart.update()
+        })
+
+        document.querySelector(".chartEnd").addEventListener('change', evt => {
+          chart.options.scales.xAxes[0].ticks.max = document.querySelector(".chartEnd").value
+          chart.update()
+        })
+
+        document.querySelector('.update-chart').addEventListener('click', evt => {
+          document.querySelector(".chartEnd").value = ''
+          document.querySelector(".chartStart").value = ''
+          chart.options.scales.xAxes[0].ticks.min = ''
+          chart.options.scales.xAxes[0].ticks.max = ''
+          chart.update()
+        })
 
         document.getElementById('chart').onclick = evt => {
-          var activePoints = chart.getElementsAtEvent(evt)
+          var activePoints = chart.getElementsAtXAxis(evt)
           var firstPoint = activePoints[0]
           var label = chart.data.labels[firstPoint._index]
           var value = chart.data.datasets[firstPoint._datasetIndex].data[firstPoint._index]
