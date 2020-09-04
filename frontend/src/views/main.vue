@@ -1,7 +1,8 @@
 <template>
   <div>
-    <h1 class="pt-5">Stock News</h1>
+    <!-- <h1 class="pt-5 text-center">Stock News</h1> -->
     <div class="container">
+      <img class="col-12 m-auto" src="@/assets/mainpage.png" alt="main">
       <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Aut molestiae molestias aperiam! Nobis, quae ducimus distinctio, necessitatibus ipsa, ratione natus illo perferendis iusto non magnam quas. Quas minima minus doloribus.</p>
       <br>
       <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Veritatis placeat dolorem molestias, expedita iusto amet sapiente, quis accusamus possimus in, eveniet quibusdam ab voluptas nisi! Tenetur distinctio quaerat magnam ullam.</p>
