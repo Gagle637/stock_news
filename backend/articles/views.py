@@ -13,7 +13,10 @@ from rest_framework.response import Response
 # Create your views here.
 def get_news(n_url):
     news_detail = []
-    breq = requests.get(n_url)
+    header = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+    }
+    breq = requests.get(n_url, headers=header)
     bsoup = BeautifulSoup(breq.content, 'html.parser')
 
     # html 파싱
@@ -23,7 +26,6 @@ def get_news(n_url):
     # 날짜 파싱
     pdate = bsoup.select('.t11')[0].get_text()[:11]
     news_detail.append(pdate)
-
     # 기사 본문 크롤링 
     _text = bsoup.select('#articleBodyContents')[0].get_text().replace('\n', " ")
     btext = _text.replace("// flash 오류를 우회하기 위한 함수 추가 function _flash_removeCallback() {}", "")
@@ -36,20 +38,20 @@ def get_news(n_url):
     return news_detail
 
 class news(APIView):
-    def get(self, request, company, date, format=None):
+    def get(self, request, company, date, page, format=None):
         query = company
         s_date = date
         e_date = date
         s_from = s_date.replace(".","")
         e_to = e_date.replace(".","")
-        page = 1
         data = {"data":[]}
-        while page < 20:
+        end_page = page + 10
+        while page < end_page:
             url = "https://search.naver.com/search.naver?where=news&query=" + query + "&sort=0&ds=" + s_date + "&de=" + e_date + "&nso=so%3Ar%2Cp%3Afrom" + s_from + "to" + e_to + "%2Ca%3A&start=" + str(page)
             header = {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
             }
-            req = requests.get(url,headers=header)
+            req = requests.get(url, headers=header)
             cont = req.content
             soup = BeautifulSoup(cont, 'html.parser')    
             for urls in soup.select("._sp_each_url"):
