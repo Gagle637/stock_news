@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="bg-light">
+  <div id="app">
     <router-view></router-view>
   </div>
 </template>
@@ -16,6 +16,7 @@ export default {
 <style>
 html, body {
   height: 100%;
+  background-color: #f8f9fa !important;
 }
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
@@ -23,6 +24,6 @@ html, body {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  /* height: 100%; */
+  height: auto;
 }
 </style>
