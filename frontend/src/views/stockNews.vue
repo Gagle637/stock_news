@@ -1,23 +1,24 @@
 <template>
-  <div>
+  <div class="container text-center">
     <h1>{{ title }}</h1>
-    <div id="myModal" class="modal">
-      <div class="modal-content">
+    <div id="myModal" class="my-modal" :class="{'now-loading': loading}">
+      <div class="my-modal-content">
         <p class="loading">
           Now Loading
         </p>
       </div>
     </div>
-    <input type="date" class="chartStart">
-    <input type="date" class="chartEnd">
-    <button class="update-chart">초기화</button>
+    <div class="range">
+      <input type="date" class="chartStart">
+      <input type="date" class="mx-3 chartEnd">
+      <button class="btn btn-primary update-chart">초기화</button>
+    </div>
     <canvas id="chart" @on-receive="click"></canvas>
-    <div v-for="(dayNews, idx) in news" :key="idx">
-      <p>{{ dayNews.title }}</p>
-      <p>{{ dayNews.date }}</p>
-      <p>{{ dayNews.link }}</p>
-      <!-- <p>{{ dayNews.description }}</p> -->
-      <!-- <p>{{ dayNews.company }}</p> -->
+    <div class="card mb-3 border" v-for="(dayNews, idx) in news" :key="idx">
+      <a :href="dayNews.link" class="card-body py-2 news" target="_blank">
+        <p class="m-0">{{ dayNews.title }}</p>
+        <p class="m-0">{{ dayNews.date }}</p>
+      </a>
     </div>
   </div>
 </template>
@@ -26,7 +27,6 @@
   import Chart from 'chart.js'
   import axios from 'axios'
   var d3 = require('d3')
-  
 
   export default {
     data: () => {
@@ -36,26 +36,49 @@
           '애플': 'apple'
         },
         title: '',
-        news: []
+        news: [],
+        page: 1,
+        date: '',
+        loading: false,
       }
+    },
+    created() {
+      document.addEventListener('scroll', this.vue_scroll)
+    },
+    beforeRouteLeave() {
+      document.removeEventListener('scroll', this.vue_scroll)
     },
     mounted() {
       this.title = this.$route.params.company
       this.stock()
     },
     methods: {
+      vue_scroll(evt) {
+        if (document.documentElement.scrollTop + window.innerHeight >= document.body.scrollHeight && this.news.length != 0) {
+          this.getNews(this.date)
+        }
+      },
       async getNews(date) {
-        document.getElementById('myModal').style.display = 'block'
-        await axios.get(`articles/news/${this.title}/${date}/`)
-          .then(res => {
-            this.news = res.data.data
-          })
-          .catch(err => {
-            console.log(err)
-          })
-        document.getElementById('myModal').style.display = ''
+        this.date = date
+        if (this.loading === false) {
+          this.loading = true
+          await axios.get(`articles/news/${this.title}/${date}/${this.page}/`)
+            .then(res => {
+              console.log(res)
+              res.data.data.forEach(value => {
+                this.news.push(value)
+              });
+              this.page = res.data.page
+            })
+            .catch(err => {
+              console.log(err)
+            })
+          this.loading = false
+        }        
       },
       async stock() {
+        this.page = 1
+        this.news = []
         let data = await d3.csv(`/dataset/${this.dataset[this.$route.params.company]}.csv`)
         let labels = data.map(function(d) {return d.Date})
         let stockData = data.map(function(d) {return d.Close})
@@ -124,6 +147,8 @@
           var label = chart.data.labels[firstPoint._index]
           var value = chart.data.datasets[firstPoint._datasetIndex].data[firstPoint._index]
           if (confirm(label + ': ' + value)) {
+            this.news = []
+            this.page = 1
             this.getNews(label.replace(/-/gi, '.'))
           }
         }
@@ -133,8 +158,22 @@
 </script>
 
 <style>
-  .modal {
-    display: None; 
+  .news:link {text-decoration: none; color: black;}
+  .news:visited {text-decoration: none; color: black;}
+  .news:active {text-decoration: none; color: black;}
+  .news:hover {text-decoration: none; color: black;}
+
+  .now-loading {
+    display: block !important;
+  }
+
+  .range {
+    float: right;
+  }
+
+  .my-modal {
+    display: none;
+    /* display: block !important; */
     position: fixed;
     z-index: 1;
     left: 0;
@@ -148,20 +187,19 @@
   }
 
   /* Modal Content/Box */
-  .modal-content {
+  .my-modal-content {
     background-color: rgba(0,0,0,0);
     margin: 20% auto;
-    width: 10em; /* Could be more or less, depending on screen size */
-    height: 10em;
-    vertical-align: middle;
+    width: 15em; /* Could be more or less, depending on screen size */
+    height: 15em;
   }
 
-  .modal-content::after {
+  .my-modal-content::after {
     content: '';
-    width: 10em;
-    height: 10em;
-    left: -2em;
-    top: -2em;
+    width: 15em;
+    height: 15em;
+    left: 0em;
+    top: 0em;
     border: 2em solid #f3f3f3; /* Light grey */
     border-top: 2em solid #3498db; /* Blue */
     border-radius: 50%;
@@ -172,11 +210,11 @@
   
   .loading {
     margin: 0;
-    width: 160px;
-    height: 160px;
+    width: 10em;
+    height: 10em;
     font-size: 1.5em;
     color: #f3f3f3;
-    line-height: 160px;
+    line-height: 10em;
     position: absolute;
     text-align: center;
     font-weight: bolder;
